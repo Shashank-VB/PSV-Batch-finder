@@ -17,7 +17,6 @@ per_hgvs = st.sidebar.number_input("Enter % of HGVs:")
 year = st.sidebar.number_input("Enter Year", min_value=0)
 lanes = st.sidebar.number_input("Enter number of lanes", min_value=1)
 
-
 # Initialize session state to store results list
 if "results_list" not in st.session_state:
     st.session_state.results_list = []
@@ -166,7 +165,7 @@ if uploaded_file is not None:
             else:
                 result3 = "No matching range found for lane 3."
 
-# Add result to session state when user clicks "Add Result"
+# Add result to session state when user clicks "Next Link Section"
 if st.sidebar.button("Next Link Section"):
     entry = {
         "Site Number": Site_Number,
@@ -188,12 +187,44 @@ if st.sidebar.button("Next Link Section"):
     }
     st.session_state.results_list.append(entry)
 
-# Display stored results
+# Display stored results with the option to edit
 st.subheader("PSV Calculation Results:")
 if st.session_state.results_list:
     df_results = pd.DataFrame(st.session_state.results_list)
     st.write(df_results)
 
+    # Add an option to edit the results (editable columns in the DataFrame)
+    edit_index = st.number_input("Enter the index of the result you want to edit:", min_value=0, max_value=len(st.session_state.results_list)-1, step=1)
+    if edit_index is not None:
+        edited_result = st.session_state.results_list[edit_index]
+        st.write(f"Editing entry at index {edit_index}:")
+        Site_Number = st.text_input("Site Number", value=edited_result["Site Number"])
+        link_section = st.text_input("Link Section", value=edited_result["Link Section"])
+        aadt_value = st.number_input("AADT value:", value=edited_result["AADT_HGVS"])
+        per_hgvs = st.number_input("HGV %", value=edited_result["AADT_HGVS"])
+        year = st.number_input("Year", value=edited_result["Design Period"])
+
+        if st.button("Save Changes"):
+            st.session_state.results_list[edit_index] = {
+                "Site Number": Site_Number,
+                "Link Section": link_section,
+                "AADT_HGVS": aadt_value,
+                "Design Period": year,
+                "Total Projected AADT HGVs": total_projected_aadt_hgvs,
+                "Lane 1": lane1,
+                "Lane 2": lane2 if lanes > 1 else 'NA',
+                "Lane 3": lane3 if lanes > 2 else 'NA',
+                "Lane 4": lane4 if lanes > 3 else 'NA',
+                "Lane 1 Details": lane_details_lane1,
+                "Lane 2 Details": lane_details_lane2,
+                "Lane 3 Details": lane_details_lane3,
+                "Lane 4 Details": lane_details_lane4,
+                "PSV Lane 1": result1,
+                "PSV Lane 2": result2,
+                "PSV Lane 3": result3
+            }
+            st.success("Result updated successfully!")
+            
     # Create a download button for CSV
     csv = df_results.to_csv(index=False)
     st.download_button(
