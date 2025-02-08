@@ -32,9 +32,11 @@ else:
 
 # Calculation for AADT_HGVS
 if per_hgvs >= 11:
-    AADT_HGVS = (per_hgvs * (aadt_value / 100))
+    result1 = per_hgvs
+    AADT_HGVS = (result1 * (aadt_value / 100))
 else:
-    AADT_HGVS = ((11 * aadt_value) / 100)
+    result2 = 11
+    AADT_HGVS = ((result2 * aadt_value) / 100)
 
 # Total projected AADT_HGVs
 total_projected_aadt_hgvs = AADT_HGVS * ((1 + 1.54 / 100) ** design_period)
@@ -42,28 +44,54 @@ AADT_HGVS = round(AADT_HGVS)
 total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
 
 # Lane details
+lane1 = 0
+lane2 = 0
+lane3 = 0
+lane4 = 0
+lane_details_lane1 = 0
+lane_details_lane2 = 0
+lane_details_lane3 = 0
+lane_details_lane4 = 0
+
 if lanes == 1:
     lane1 = 100
-elif lanes == 2:
-    lane1 = 50
-    lane2 = 50
-elif lanes == 3:
-    lane1 = 33
-    lane2 = 33
-    lane3 = 34
-else:
-    lane1 = 25
-    lane2 = 25
-    lane3 = 25
-    lane4 = 25
+    lane_details_lane1 = total_projected_aadt_hgvs
+elif lanes > 1 and lanes <= 3:
+    if total_projected_aadt_hgvs < 5000:
+        lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
+        lane2 = round(100 - (100 - (0.0036 * total_projected_aadt_hgvs)))
+    elif total_projected_aadt_hgvs >= 5000 and total_projected_aadt_hgvs < 25000:
+        lane1 = round(89 - (0.0014 * total_projected_aadt_hgvs))
+        lane2 = round(100 - lane1)
+    elif total_projected_aadt_hgvs >= 25000:
+        lane1 = 54
+        lane2 = 100 - 54
+        lane3 = 0
+    lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
+    lane_details_lane2 = round(total_projected_aadt_hgvs * (lane2 / 100))
 
-# Store lane values for display
-lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
-lane_details_lane2 = round(total_projected_aadt_hgvs * (lane2 / 100)) if lanes > 1 else 0
-lane_details_lane3 = round(total_projected_aadt_hgvs * (lane3 / 100)) if lanes > 2 else 0
-lane_details_lane4 = round(total_projected_aadt_hgvs * (lane4 / 100)) if lanes > 3 else 0
+elif lanes >= 4:
+    if total_projected_aadt_hgvs <= 10500:
+        lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
+        lane_2_3 = (total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100))
+        lane2 = round(89 - (0.0014 * lane_2_3))
+        lane3 = 100 - lane2
+        lane4 = 0
+    elif total_projected_aadt_hgvs > 10500 and total_projected_aadt_hgvs < 25000:
+        lane1 = round(75 - (0.0012 * total_projected_aadt_hgvs))
+        lane_2_3 = (total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100))
+        lane2 = round(89 - (0.0014 * lane_2_3))
+        lane3 = 100 - lane2
+        lane4 = 0
+    elif total_projected_aadt_hgvs >= 25000:
+        lane1 = 45
+        lane2 = 54
+        lane3 = 100 - 54
+    lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
+    lane_details_lane2 = round((total_projected_aadt_hgvs - lane_details_lane1) * (lane2 / 100))
+    lane_details_lane3 = round(total_projected_aadt_hgvs - (lane_details_lane1 + lane_details_lane2))
 
-# PSV Calculation - Placeholder logic
+# PSV Calculation - Placeholder logic (based on the upload of the PSV lookup table)
 value1 = st.sidebar.text_input("Enter Site Category:")
 value2 = st.sidebar.number_input("Enter IL value:")
 result1 = 'NA'
