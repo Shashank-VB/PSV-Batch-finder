@@ -6,11 +6,6 @@ import math
 def roundup(value):
     return math.ceil(value)
 
-# Function to load PSV data
-def load_psv_data(psv_file):
-    df = pd.read_csv(psv_file)
-    return df.set_index(['SiteCategory', 'IL', 'AADT_HGVS'])['PSV'].to_dict()
-
 # Function to calculate PSV values
 def calculate_psv(aadt_value, per_hgvs, year, lanes, site_category, il_value, psv_data):
     if year == 0:
@@ -89,18 +84,23 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes, site_category, il_value, ps
 # Streamlit UI
 st.title("PSV Calculator from CSV")
 
-# Upload CSV for Input Data
-uploaded_file = st.file_uploader("Upload Input CSV file", type=["csv"])
-# Upload CSV for PSV Table
-uploaded_psv_file = st.file_uploader("Upload PSV Table CSV file", type=["csv"])
+uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
+psv_file = st.file_uploader("Upload PSV Excel file", type=["xlsx"])
 
-if uploaded_file is not None and uploaded_psv_file is not None:
+if uploaded_file is not None and psv_file is not None:
+    # Read the input CSV file
     df = pd.read_csv(uploaded_file)
-    st.write("Uploaded Input Data:", df.head())
-
-    # Load PSV Data
-    psv_data = load_psv_data(uploaded_psv_file)
-
+    st.write("Uploaded Data:", df.head())
+    
+    # Read the PSV data from the uploaded Excel file
+    psv_df = pd.read_excel(psv_file, sheet_name="Sheet1")  # Adjust sheet_name if necessary
+    psv_data = {}
+    
+    # Build a dictionary for PSV lookup
+    for index, row in psv_df.iterrows():
+        key = (row['SiteCategory'], row['IL'], row['LaneDetails'])
+        psv_data[key] = row['PSV']
+    
     results = []
     for index, row in df.iterrows():
         result = calculate_psv(
@@ -113,6 +113,7 @@ if uploaded_file is not None and uploaded_psv_file is not None:
     output_df = pd.DataFrame(results)
     st.write("Calculated Results:", output_df.head())
     
+    # Export output as CSV
     output_csv = output_df.to_csv(index=False).encode('utf-8')
     st.download_button(
         label="Download CSV Output",
