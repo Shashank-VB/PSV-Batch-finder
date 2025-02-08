@@ -187,51 +187,50 @@ if st.sidebar.button("Next Link Section"):
     }
     st.session_state.results_list.append(entry)
 
-# Display stored results with the option to edit
+# Display stored results with a collapsible section
 st.subheader("PSV Calculation Results:")
-if st.session_state.results_list:
-    df_results = pd.DataFrame(st.session_state.results_list)
-    st.write(df_results)
+with st.expander("View PSV Calculation Results", expanded=True):
+    if st.session_state.results_list:
+        df_results = pd.DataFrame(st.session_state.results_list)
+        st.write(df_results)
 
-    # Add an option to edit the results (editable columns in the DataFrame)
-    edit_index = st.number_input("Enter the index of the result you want to edit:", min_value=0, max_value=len(st.session_state.results_list)-1, step=1)
-    if edit_index is not None:
-        edited_result = st.session_state.results_list[edit_index]
-        st.write(f"Editing entry at index {edit_index}:")
-        Site_Number = st.text_input("Site Number", value=edited_result["Site Number"])
-        link_section = st.text_input("Link Section", value=edited_result["Link Section"])
-        aadt_value = st.number_input("AADT value:", value=edited_result["AADT_HGVS"])
-        per_hgvs = st.number_input("HGV %", value=edited_result["AADT_HGVS"])
-        year = st.number_input("Year", value=edited_result["Design Period"])
+        # Create a download button for CSV
+        csv = df_results.to_csv(index=False)
+        st.download_button(
+            label="Download All Results as CSV",
+            data=csv,
+            file_name="psv_results.csv",
+            mime="text/csv"
+        )
+    else:
+        st.write("No results added yet.")
 
-        if st.button("Save Changes"):
-            st.session_state.results_list[edit_index] = {
-                "Site Number": Site_Number,
-                "Link Section": link_section,
-                "AADT_HGVS": aadt_value,
-                "Design Period": year,
-                "Total Projected AADT HGVs": total_projected_aadt_hgvs,
-                "Lane 1": lane1,
-                "Lane 2": lane2 if lanes > 1 else 'NA',
-                "Lane 3": lane3 if lanes > 2 else 'NA',
-                "Lane 4": lane4 if lanes > 3 else 'NA',
-                "Lane 1 Details": lane_details_lane1,
-                "Lane 2 Details": lane_details_lane2,
-                "Lane 3 Details": lane_details_lane3,
-                "Lane 4 Details": lane_details_lane4,
-                "PSV Lane 1": result1,
-                "PSV Lane 2": result2,
-                "PSV Lane 3": result3
-            }
-            st.success("Result updated successfully!")
+# Collapsible section for editing results
+with st.expander("Edit Results"):
+    if st.session_state.results_list:
+        df_results = pd.DataFrame(st.session_state.results_list)
+        selected_index = st.selectbox("Select row to edit", options=range(len(df_results)), format_func=lambda x: f"Row {x+1}")
+        
+        if selected_index is not None:
+            selected_row = df_results.iloc[selected_index]
             
-    # Create a download button for CSV
-    csv = df_results.to_csv(index=False)
-    st.download_button(
-        label="Download All Results as CSV",
-        data=csv,
-        file_name="psv_results.csv",
-        mime="text/csv"
-    )
-else:
-    st.write("No results added yet.")
+            # Editable fields
+            edited_site_number = st.text_input("Edit Site Number", value=selected_row["Site Number"])
+            edited_link_section = st.text_input("Edit Link Section", value=selected_row["Link Section"])
+            edited_aadt_hgvs = st.number_input("Edit AADT_HGVS", value=selected_row["AADT_HGVS"])
+            edited_design_period = st.number_input("Edit Design Period", value=selected_row["Design Period"])
+            edited_total_projected_aadt_hgvs = st.number_input("Edit Total Projected AADT HGVs", value=selected_row["Total Projected AADT HGVs"])
+            
+            # Update Button
+            if st.button("Update Entry"):
+                st.session_state.results_list[selected_index] = {
+                    "Site Number": edited_site_number,
+                    "Link Section": edited_link_section,
+                    "AADT_HGVS": edited_aadt_hgvs,
+                    "Design Period": edited_design_period,
+                    "Total Projected AADT HGVs": edited_total_projected_aadt_hgvs
+                }
+                st.success("Entry updated successfully!")
+                st.rerun()
+    else:
+        st.write("No results to edit.")
