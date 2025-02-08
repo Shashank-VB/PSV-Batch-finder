@@ -125,9 +125,6 @@ if uploaded_file is not None:
     # Read the Excel file into a DataFrame
     df = pd.read_excel(uploaded_file)
 
-    # Display the DataFrame for debugging
-    st.write("Excel Data:", df)
-
     # Add a "Search" button
     if st.sidebar.button("Search"):
         # For LANE-1
