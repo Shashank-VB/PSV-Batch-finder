@@ -4,6 +4,7 @@ import time
 import math
 import pandas as pd
 import os
+import io
 
 # Title
 st.title("Polished Stone Value (PSV) Calculator Results")
@@ -197,3 +198,43 @@ if uploaded_file is not None:
                 else:
                         result = "No matching range found for the given value."
                 st.write(f"PSV at Lane3: {result3}")
+import io
+import pandas as pd
+import streamlit as st
+
+# Assuming you already have your results calculated for PSV and lane details
+
+# Create a DataFrame with results
+results_data = {
+    'AADT_HGVS': [AADT_HGVS],
+    'Design Period': [design_period],
+    'Total Projected AADT HGVs': [total_projected_aadt_hgvs],
+    'Lane 1': [lane1],
+    'Lane 2': [lane2],
+    'Lane 3': [lane3],
+    'Lane 4': [lane4],
+    'Lane 1 Details': [lane_details_lane1],
+    'Lane 2 Details': [lane_details_lane2],
+    'Lane 3 Details': [lane_details_lane3],
+    'Lane 4 Details': [lane_details_lane4],
+    'PSV Lane 1': [result if uploaded_file is not None else 'NA'],
+    'PSV Lane 2': [result2 if uploaded_file is not None else 'NA'],
+    'PSV Lane 3': [result3 if uploaded_file is not None else 'NA']
+}
+
+# Convert to DataFrame
+df_results = pd.DataFrame(results_data)
+
+# Display the DataFrame on the Streamlit page
+st.write("PSV Results DataFrame", df_results)
+
+# Convert the DataFrame to CSV
+csv_data = df_results.to_csv(index=False)
+
+# Create a download button for the CSV file
+st.download_button(
+    label="Download Results as CSV",
+    data=csv_data,
+    file_name='psv_results.csv',
+    mime='text/csv'
+)
