@@ -125,6 +125,9 @@ if uploaded_file is not None:
     # Read the Excel file into a DataFrame
     df = pd.read_excel(uploaded_file)
 
+    # Display the DataFrame for debugging
+    st.write("Excel Data:", df)
+
     # Add a "Search" button
     if st.sidebar.button("Search"):
         # For LANE-1
@@ -187,37 +190,8 @@ if uploaded_file is not None:
             else:
                 result3 = "No matching range found for the given value."
 
-# Create a DataFrame with the calculated results
-result_data = {
-    'AADT Value': [aadt_value],
-    'Percentage of HGVs': [per_hgvs],
-    'Design Year': [year],
-    'Number of Lanes': [lanes],
-    'AADT_HGVs': [AADT_HGVS],
-    'Total Projected AADT HGVs': [total_projected_aadt_hgvs],
-    'Lane 1 %': [lane1],
-    'Lane 2 %': [lane2],
-    'Lane 3 %': [lane3],
-    'Lane 4 %': [lane4],
-    'Lane 1 Details': [lane_details_lane1],
-    'Lane 2 Details': [lane_details_lane2],
-    'Lane 3 Details': [lane_details_lane3],
-    'Lane 4 Details': [lane_details_lane4],
-    'PSV Lane 1': [result],
-    'PSV Lane 2': [result2],
-    'PSV Lane 3': [result3]
-}
+# Display the results
+st.write("PSV Lane 1:", result)
+st.write("PSV Lane 2:", result2)
+st.write("PSV Lane 3:", result3)
 
-# Create DataFrame
-df_results = pd.DataFrame(result_data)
-
-# Convert the DataFrame to CSV
-csv = df_results.to_csv(index=False)
-
-# Create a download link
-st.download_button(
-    label="Download Results as CSV",
-    data=csv,
-    file_name="PSV_Calculator_Results.csv",
-    mime="text/csv"
-)
