@@ -199,6 +199,7 @@ st.write("PSV Lane 3:", result3)
 
 # Create a DataFrame with results
 results_data = {
+    'Link Section': [link_section]  # Add Link Section to the results
     'AADT_HGVS': [AADT_HGVS],
     'Design Period': [design_period],
     'Total Projected AADT HGVs': [total_projected_aadt_hgvs],
@@ -213,7 +214,7 @@ results_data = {
     'PSV Lane 1': [result if uploaded_file is not None else 'NA'],
     'PSV Lane 2': [result2 if uploaded_file is not None else 'NA'],
     'PSV Lane 3': [result3 if uploaded_file is not None else 'NA'],
-    'Link Section': [link_section]  # Add Link Section to the results
+    
 }
 
 # Convert to DataFrame
