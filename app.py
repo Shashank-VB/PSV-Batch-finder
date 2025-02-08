@@ -93,7 +93,7 @@ if uploaded_file is not None and psv_file is not None:
     st.write("Uploaded Data:", df.head())
     
     # Read the PSV data from the uploaded Excel file
-    psv_df = pd.read_excel(psv_file, sheet_name="Sheet1")  # Adjust sheet_name if necessary
+    psv_df = pd.read_excel(psv_file, sheet_name=0)  # 0 refers to the first sheet
     psv_data = {}
     
     # Build a dictionary for PSV lookup
