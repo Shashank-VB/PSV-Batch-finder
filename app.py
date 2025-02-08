@@ -199,7 +199,7 @@ if uploaded_file is not None:
                         result = "No matching range found for the given value."
                 st.write(f"PSV at Lane3: {result3}")
 
-        # Add a button for downloading the results as CSV
+      # Add a button for downloading the results as CSV
 if st.sidebar.button("Download Results as CSV"):
     # Create a DataFrame with the calculated results
     result_data = {
@@ -216,15 +216,25 @@ if st.sidebar.button("Download Results as CSV"):
         'Lane 1 Details': [lane_details_lane1],
         'Lane 2 Details': [lane_details_lane2],
         'Lane 3 Details': [lane_details_lane3],
-        'Lane 4 Details': [lane_details_lane4],
-        'PSV Lane 1': [result if uploaded_file is not None else 'NA'],
-        'PSV Lane 2': [result2 if uploaded_file is not None else 'NA'],
-        'PSV Lane 3': [result3 if uploaded_file is not None else 'NA']
+        'Lane 4 Details': [lane_details_lane4]
     }
+
+    # Check if the uploaded file is present and results are defined
+    if uploaded_file is not None:
+        result_data['PSV Lane 1'] = [result] if 'result' in locals() else ['NA']
+        result_data['PSV Lane 2'] = [result2] if 'result2' in locals() else ['NA']
+        result_data['PSV Lane 3'] = [result3] if 'result3' in locals() else ['NA']
+    else:
+        result_data['PSV Lane 1'] = ['NA']
+        result_data['PSV Lane 2'] = ['NA']
+        result_data['PSV Lane 3'] = ['NA']
+
+    # Create DataFrame
     df_results = pd.DataFrame(result_data)
 
     # Convert the DataFrame to CSV
     csv = df_results.to_csv(index=False)
+    
     # Create a download link
     st.download_button(
         label="Download Results as CSV",
