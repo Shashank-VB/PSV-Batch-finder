@@ -199,8 +199,78 @@ if uploaded_file is not None:
                         result = "No matching range found for the given value."
                 st.write(f"PSV at Lane3: {result3}")
 
-      # Add a button for downloading the results as CSV
+  import io
+
+# Add a button for downloading the results as CSV
 if st.sidebar.button("Download Results as CSV"):
+    # Default PSV values
+    result = 'NA'
+    result2 = 'NA'
+    result3 = 'NA'
+
+    # Perform PSV calculations only if the file is uploaded and the search button is clicked
+    if uploaded_file is not None:
+        df = pd.read_excel(uploaded_file)
+
+        # Add a "Search" button to trigger the filtering logic
+        if st.sidebar.button("Search"):
+            # For LANE-1
+            range_column = None
+            for col in df.columns:
+                if '-' in col:
+                    col_range = list(map(int, col.split('-')))
+                    if col_range[0] <= value3 <= col_range[1]:
+                        range_column = col
+                        break
+            if range_column:
+                filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
+                if not filtered_df.empty:
+                    result = filtered_df.iloc[0][range_column]
+                else:
+                    result = "No matching result found."
+            else:
+                result = "No matching range found for the given value."
+
+            # For LANE-2
+            if value4 == 0:
+                result2 = 'NA'
+            else:
+                range_column = None
+                for col in df.columns:
+                    if '-' in col:
+                        col_range = list(map(int, col.split('-')))
+                        if col_range[0] <= value4 <= col_range[1]:
+                            range_column = col
+                            break
+                if range_column:
+                    filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
+                    if not filtered_df.empty:
+                        result2 = filtered_df.iloc[0][range_column]
+                    else:
+                        result2 = "No matching result found."
+                else:
+                    result2 = "No matching range found for the given value."
+
+            # For LANE-3
+            if value5 == 0:
+                result3 = 'NA'
+            else:
+                range_column = None
+                for col in df.columns:
+                    if '-' in col:
+                        col_range = list(map(int, col.split('-')))
+                        if col_range[0] <= value5 <= col_range[1]:
+                            range_column = col
+                            break
+                if range_column:
+                    filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
+                    if not filtered_df.empty:
+                        result3 = filtered_df.iloc[0][range_column]
+                    else:
+                        result3 = "No matching result found."
+                else:
+                    result3 = "No matching range found for the given value."
+
     # Create a DataFrame with the calculated results
     result_data = {
         'AADT Value': [aadt_value],
@@ -216,18 +286,11 @@ if st.sidebar.button("Download Results as CSV"):
         'Lane 1 Details': [lane_details_lane1],
         'Lane 2 Details': [lane_details_lane2],
         'Lane 3 Details': [lane_details_lane3],
-        'Lane 4 Details': [lane_details_lane4]
+        'Lane 4 Details': [lane_details_lane4],
+        'PSV Lane 1': [result],
+        'PSV Lane 2': [result2],
+        'PSV Lane 3': [result3]
     }
-
-    # Check if the uploaded file is present and results are defined
-    if uploaded_file is not None:
-        result_data['PSV Lane 1'] = [result] if 'result' in locals() else ['NA']
-        result_data['PSV Lane 2'] = [result2] if 'result2' in locals() else ['NA']
-        result_data['PSV Lane 3'] = [result3] if 'result3' in locals() else ['NA']
-    else:
-        result_data['PSV Lane 1'] = ['NA']
-        result_data['PSV Lane 2'] = ['NA']
-        result_data['PSV Lane 3'] = ['NA']
 
     # Create DataFrame
     df_results = pd.DataFrame(result_data)
