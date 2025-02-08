@@ -78,10 +78,6 @@ if uploaded_file is not None:
     # Read the uploaded Excel file into a DataFrame
     df_psv_lookup = pd.read_excel(uploaded_file)
 
-    # Display the first few rows of the uploaded PSV lookup table
-    st.write("PSV Lookup Table (First 5 rows):")
-    st.write(df_psv_lookup.head())
-
     # Perform PSV Lookup based on inputs
     if value1 and value2:
         # Assuming the uploaded table has columns: 'SiteCategory', 'IL', and the range columns like '0-10', '10-20', etc.
@@ -162,7 +158,7 @@ if st.sidebar.button("Add Result"):
     st.session_state.results_list.append(entry)
 
 # Display stored results
-st.subheader("All Results:")
+st.subheader("PSV Calculation Results:")
 if st.session_state.results_list:
     df_results = pd.DataFrame(st.session_state.results_list)
     st.write(df_results)
