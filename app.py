@@ -10,11 +10,12 @@ st.sidebar.title("Polished Stone Value (PSV) Calculator")
 st.sidebar.header("Enter values:")
 
 # Input fields
+link_section = st.sidebar.text_input("Enter Link Section:")
 aadt_value = st.sidebar.number_input("Enter AADT value:", min_value=0)
 per_hgvs = st.sidebar.number_input("Enter % of HGVs:")
 year = st.sidebar.number_input("Enter Year", min_value=0)
 lanes = st.sidebar.number_input("Enter number of lanes", min_value=1)
-link_section = st.sidebar.text_input("Enter Link Section:")
+
 
 # Initialize session state to store results list
 if "results_list" not in st.session_state:
