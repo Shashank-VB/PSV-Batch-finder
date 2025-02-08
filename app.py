@@ -9,7 +9,6 @@ st.title("Polished Stone Value (PSV) Calculator Results")
 # Input parameters
 st.sidebar.title ("Polished Stone Value (PSV) Calculator")
 st.sidebar.header ("Enter values:")
-Link section = st.sidebar.number_input("Enter Link section", min_value=0)
 aadt_value = st.sidebar.number_input("enter AADT value:", min_value=0)
 per_hgvs = st.sidebar.number_input("enter % of HGVs:")
 year = st.sidebar.number_input("enter Year", min_value=0)
