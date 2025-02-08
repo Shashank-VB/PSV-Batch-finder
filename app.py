@@ -6,6 +6,11 @@ import math
 def roundup(value):
     return math.ceil(value)
 
+# Function to load PSV data
+def load_psv_data(psv_file):
+    df = pd.read_csv(psv_file)
+    return df.set_index(['SiteCategory', 'IL', 'AADT_HGVS'])['PSV'].to_dict()
+
 # Function to calculate PSV values
 def calculate_psv(aadt_value, per_hgvs, year, lanes, site_category, il_value, psv_data):
     if year == 0:
@@ -84,14 +89,18 @@ def calculate_psv(aadt_value, per_hgvs, year, lanes, site_category, il_value, ps
 # Streamlit UI
 st.title("PSV Calculator from CSV")
 
-uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
-if uploaded_file is not None:
+# Upload CSV for Input Data
+uploaded_file = st.file_uploader("Upload Input CSV file", type=["csv"])
+# Upload CSV for PSV Table
+uploaded_psv_file = st.file_uploader("Upload PSV Table CSV file", type=["csv"])
+
+if uploaded_file is not None and uploaded_psv_file is not None:
     df = pd.read_csv(uploaded_file)
-    st.write("Uploaded Data:", df.head())
-    
-    # Dummy PSV data (replace with actual PSV data retrieval method)
-    psv_data = {}
-    
+    st.write("Uploaded Input Data:", df.head())
+
+    # Load PSV Data
+    psv_data = load_psv_data(uploaded_psv_file)
+
     results = []
     for index, row in df.iterrows():
         result = calculate_psv(
