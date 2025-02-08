@@ -13,6 +13,7 @@ aadt_value = st.sidebar.number_input("enter AADT value:", min_value=0)
 per_hgvs = st.sidebar.number_input("enter % of HGVs:")
 year = st.sidebar.number_input("enter Year", min_value=0)
 lanes = st.sidebar.number_input("enter number of Lanes", min_value=1)
+link_section = st.sidebar.text_input("Enter Link Section:")
 
 pcvl = 0
 lane1 = 0
@@ -210,7 +211,8 @@ results_data = {
     'Lane 4 Details': [lane_details_lane4],
     'PSV Lane 1': [result if uploaded_file is not None else 'NA'],
     'PSV Lane 2': [result2 if uploaded_file is not None else 'NA'],
-    'PSV Lane 3': [result3 if uploaded_file is not None else 'NA']
+    'PSV Lane 3': [result3 if uploaded_file is not None else 'NA'],
+    'Link Section': [link_section]  # Add Link Section to the results
 }
 
 # Convert to DataFrame
