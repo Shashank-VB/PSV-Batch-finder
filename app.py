@@ -1,55 +1,29 @@
+import streamlit as st
 import pandas as pd
 import math
-import streamlit as st
-import io
 
-# Title
-st.title("Polished Stone Value (PSV) Calculator Results")
-
-# Input parameters
-st.sidebar.title("Polished Stone Value (PSV) Calculator")
-st.sidebar.header("Enter values:")
-
-# Create a form to enter multiple link sections with input parameters
-link_sections_input = st.sidebar.text_area("Enter Link Sections (separate with commas)", "")
-link_section_list = [link.strip() for link in link_sections_input.split(',') if link.strip()]
-
-# Initialize the DataFrame to hold all link section results
-all_results = []
-
-# PSV Table (to be uploaded by the user)
-uploaded_file = st.sidebar.file_uploader("Upload your Excel file with PSV table", type=["xlsx"])
-
+# Function to round up values
 def roundup(value):
     return math.ceil(value)
 
-# Process each link section
-for link_section in link_section_list:
-    # User inputs for the current link section
-    aadt_value = st.sidebar.number_input(f"Enter AADT for {link_section}:", min_value=0, key=f"aadt_{link_section}")
-    per_hgvs = st.sidebar.number_input(f"Enter % of HGVs for {link_section}:", min_value=0, key=f"per_hgvs_{link_section}")
-    year = st.sidebar.number_input(f"Enter Year for {link_section}:", min_value=0, key=f"year_{link_section}")
-    lanes = st.sidebar.number_input(f"Enter number of lanes for {link_section}:", min_value=1, key=f"lanes_{link_section}")
-
-    # Design period
+# Function to calculate PSV values
+def calculate_psv(aadt_value, per_hgvs, year, lanes, site_category, il_value, psv_data):
     if year == 0:
         design_period = 0
     else:
-        design_period = ((20 + 2025) - year)
-
-    # AADT_HGVS Calculation
+        design_period = (20 + 2025) - year
+    
     if per_hgvs >= 11:
         AADT_HGVS = (per_hgvs * (aadt_value / 100))
     else:
         AADT_HGVS = (11 * aadt_value) / 100
-
+    
     total_projected_aadt_hgvs = AADT_HGVS * (1 + 1.54 / 100) ** design_period
     AADT_HGVS = round(AADT_HGVS)
     total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
-
-    # Lane calculation
-    lane1, lane2, lane3, lane4 = 0, 0, 0, 0
-    lane_details_lane1, lane_details_lane2, lane_details_lane3, lane_details_lane4 = 0, 0, 0, 0
+    
+    lane1 = lane2 = lane3 = lane4 = 0
+    lane_details_lane1 = lane_details_lane2 = lane_details_lane3 = lane_details_lane4 = 0
     
     if lanes == 1:
         lane1 = 100
@@ -60,92 +34,90 @@ for link_section in link_section_list:
             lane2 = round(100 - lane1)
         elif total_projected_aadt_hgvs >= 5000 and total_projected_aadt_hgvs < 25000:
             lane1 = round(89 - (0.0014 * total_projected_aadt_hgvs))
-            lane2 = round(100 - lane1)
+            lane2 = 100 - lane1
         else:
             lane1 = 54
-            lane2 = 100 - 54
+            lane2 = 46
         lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
         lane_details_lane2 = round(total_projected_aadt_hgvs * (lane2 / 100))
-
     elif lanes >= 4:
         if total_projected_aadt_hgvs <= 10500:
             lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
             lane_2_3 = total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100)
             lane2 = round(89 - (0.0014 * lane_2_3))
             lane3 = 100 - lane2
-            lane4 = 0
         elif total_projected_aadt_hgvs > 10500 and total_projected_aadt_hgvs < 25000:
             lane1 = round(75 - (0.0012 * total_projected_aadt_hgvs))
             lane_2_3 = total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100)
             lane2 = round(89 - (0.0014 * lane_2_3))
             lane3 = 100 - lane2
-            lane4 = 0
         else:
             lane1 = 45
             lane2 = 54
-            lane3 = 100 - 54
+            lane3 = 1
         lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
         lane_details_lane2 = round((total_projected_aadt_hgvs - lane_details_lane1) * (lane2 / 100))
         lane_details_lane3 = round(total_projected_aadt_hgvs - (lane_details_lane1 + lane_details_lane2))
+    
+    # PSV Lookup
+    psv_lane1 = psv_data.get((site_category, il_value, lane_details_lane1), "No matching PSV")
+    psv_lane2 = psv_data.get((site_category, il_value, lane_details_lane2), "No matching PSV") if lane_details_lane2 > 0 else "NA"
+    psv_lane3 = psv_data.get((site_category, il_value, lane_details_lane3), "No matching PSV") if lane_details_lane3 > 0 else "NA"
+    
+    return {
+        "AADT_HGVS": AADT_HGVS,
+        "Design Period": design_period,
+        "Total Projected AADT HGVs": total_projected_aadt_hgvs,
+        "Lane 1 %": lane1,
+        "Lane 2 %": lane2,
+        "Lane 3 %": lane3,
+        "Lane 4 %": lane4,
+        "Lane 1 Details": lane_details_lane1,
+        "Lane 2 Details": lane_details_lane2,
+        "Lane 3 Details": lane_details_lane3,
+        "Lane 4 Details": lane_details_lane4,
+        "PSV Lane 1": psv_lane1,
+        "PSV Lane 2": psv_lane2,
+        "PSV Lane 3": psv_lane3
+    }
 
-    # PSV calculation (with placeholders if no data is uploaded)
-    result, result2, result3 = 'NA', 'NA', 'NA'
+# Streamlit UI
+st.title("PSV Calculator from CSV")
 
-    # If PSV table is uploaded, read and search for the matching values
-    if uploaded_file is not None:
-        df = pd.read_excel(uploaded_file)
+uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
+psv_file = st.file_uploader("Upload PSV Excel file", type=["xlsx"])
 
-        # Example logic: using site category and IL value from the uploaded table
-        value1 = st.sidebar.text_input(f"Enter Site Category for {link_section}:")
-        value2 = st.sidebar.number_input(f"Enter IL value for {link_section}:")
-        
-        # Placeholder search logic based on the uploaded table
-        # Assume `df` contains columns `SiteCategory`, `IL`, and columns with ranges for PSV calculation
-        if not df.empty:
-            # For Lane 1 PSV (example of how to look up the value)
-            for col in df.columns:
-                if '-' in col:
-                    col_range = list(map(int, col.split('-')))
-                    if col_range[0] <= lane_details_lane1 <= col_range[1]:
-                        range_column = col
-                        filtered_df = df[(df['SiteCategory'] == value1) & (df['IL'] == value2)]
-                        if not filtered_df.empty:
-                            result = filtered_df.iloc[0][range_column]
-                            break
-        # Add similar logic for Lane 2 and Lane 3 if needed
-
-    # Store the results in the list for all link sections
-    all_results.append({
-        'Link Section': link_section,
-        'AADT_HGVS': AADT_HGVS,
-        'Design Period': design_period,
-        'Total Projected AADT HGVs': total_projected_aadt_hgvs,
-        'Lane 1': lane1,
-        'Lane 2': lane2,
-        'Lane 3': lane3,
-        'Lane 4': lane4,
-        'Lane 1 Details': lane_details_lane1,
-        'Lane 2 Details': lane_details_lane2,
-        'Lane 3 Details': lane_details_lane3,
-        'Lane 4 Details': lane_details_lane4,
-        'PSV Lane 1': result,
-        'PSV Lane 2': result2,
-        'PSV Lane 3': result3,
-    })
-
-# Convert the results list into a DataFrame
-df_results = pd.DataFrame(all_results)
-
-# Display the DataFrame on the Streamlit page
-st.write("PSV Results Output", df_results)
-
-# Convert the DataFrame to CSV
-csv_data = df_results.to_csv(index=False)
-
-# Create a download button for the CSV file
-st.download_button(
-    label="Download Results as CSV",
-    data=csv_data,
-    file_name='psv_results.csv',
-    mime='text/csv'
-)
+if uploaded_file is not None and psv_file is not None:
+    # Read the input CSV file
+    df = pd.read_csv(uploaded_file)
+    st.write("Uploaded Data:", df.head())
+    
+    # Read the PSV data from the uploaded Excel file
+    psv_df = pd.read_excel(psv_file, sheet_name="Sheet1")  # Adjust sheet_name if necessary
+    psv_data = {}
+    
+    # Build a dictionary for PSV lookup
+    for index, row in psv_df.iterrows():
+        key = (row['SiteCategory'], row['IL'], row['LaneDetails'])
+        psv_data[key] = row['PSV']
+    
+    results = []
+    for index, row in df.iterrows():
+        result = calculate_psv(
+            row['AADT'], row['HGV_Percentage'], row['Year'], row['Lanes'], row['SiteCategory'], row['IL'], psv_data
+        )
+        result['SiteCategory'] = row['SiteCategory']
+        result['IL'] = row['IL']
+        results.append(result)
+    
+    output_df = pd.DataFrame(results)
+    st.write("Calculated Results:", output_df.head())
+    
+    # Export output as CSV
+    output_csv = output_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Download CSV Output",
+        data=output_csv,
+        file_name="psv_output.csv",
+        mime="text/csv"
+    )
