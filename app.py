@@ -101,7 +101,7 @@ result2 = 'NA'
 result3 = 'NA'
 
 # Upload PSV lookup table (Excel file)
-st.sidebar.header("Upload PSV Lookup Table")
+st.sidebar.header("Upload DMRB CD 236 table 3.3b")
 uploaded_file = st.sidebar.file_uploader("Upload Excel file with PSV Lookup Table", type=["xlsx"])
 
 if uploaded_file is not None:
@@ -167,8 +167,9 @@ if uploaded_file is not None:
                 result3 = "No matching range found for lane 3."
 
 # Add result to session state when user clicks "Add Result"
-if st.sidebar.button("Add Result"):
+if st.sidebar.button("Next Link Section"):
     entry = {
+        "Site Number": Site_Number,
         "Link Section": link_section,
         "AADT_HGVS": AADT_HGVS,
         "Design Period": design_period,
