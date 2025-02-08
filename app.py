@@ -199,21 +199,25 @@ entry = {
     'Link Section': link_section
 }
 
-# Append new entry to results list
-st.session_state.results_list.append(entry)
+# Button to save entry
+if st.sidebar.button("Add Result"):
+    st.session_state.results_list.append(entry)
 
 # Display all results
-st.write("All PSV Results Output")
-df_results = pd.DataFrame(st.session_state.results_list)
-st.write(df_results)
+st.subheader("All PSV Results Output")
+if st.session_state.results_list:
+    df_results = pd.DataFrame(st.session_state.results_list)
+    st.write(df_results)
 
-# Convert the DataFrame to CSV
-csv_data = df_results.to_csv(index=False)
+    # Convert the DataFrame to CSV
+    csv_data = df_results.to_csv(index=False)
 
-# Create a download button for the CSV file
-st.download_button(
-    label="Download All Results as CSV",
-    data=csv_data,
-    file_name='psv_results_multiple.csv',
-    mime='text/csv'
-)
+    # Create a download button for the CSV file
+    st.download_button(
+        label="Download All Results as CSV",
+        data=csv_data,
+        file_name='psv_results_multiple.csv',
+        mime='text/csv'
+    )
+else:
+    st.write("No results to display yet.")
