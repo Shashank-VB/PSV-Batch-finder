@@ -15,15 +15,9 @@ year = st.sidebar.number_input("enter Year", min_value=0)
 lanes = st.sidebar.number_input("enter number of Lanes", min_value=1)
 link_section = st.sidebar.text_input("Enter Link Section:")
 
-pcvl = 0
-lane1 = 0
-lane2 = 0
-lane3 = 0
-lane4 = 0
-lane_details_lane1 = 0
-lane_details_lane2 = 0
-lane_details_lane3 = 0
-lane_details_lane4 = 0
+# Initialize session state for storing multiple entries
+if "results_list" not in st.session_state:
+    st.session_state.results_list = []
 
 def roundup(value):
     return math.ceil(value)
@@ -103,12 +97,6 @@ st.write("Lane Details Lane2:", lane_details_lane2)
 st.write("Lane Details Lane3:", lane_details_lane3)
 st.write("Lane Details Lane4:", lane_details_lane4)
 
-# Excel to DataFrame
-st.sidebar.header("Upload CD 236 excel file with table")
-
-# Add a file uploader widget
-uploaded_file = st.sidebar.file_uploader("Upload your Excel file:", type=["xlsx"])
-
 # PSV Final
 value1 = st.sidebar.text_input("enter Site Category:")
 value2 = st.sidebar.number_input("enter IL value:")
@@ -122,6 +110,9 @@ st.subheader("PSV Values at each lane")
 result = 'NA'
 result2 = 'NA'
 result3 = 'NA'
+
+# Add a file uploader widget
+uploaded_file = st.sidebar.file_uploader("Upload your Excel file:", type=["xlsx"])
 
 if uploaded_file is not None:
     # Read the Excel file into a DataFrame
@@ -189,45 +180,40 @@ if uploaded_file is not None:
             else:
                 result3 = "No matching range found for the given value."
 
-# Display the results
-st.write("PSV Lane 1:", result)
-st.write("PSV Lane 2:", result2)
-st.write("PSV Lane 3:", result3)
-
-# Assuming you already have your results calculated for PSV and lane details
-
-# Create a DataFrame with results
-results_data = {
-    'AADT_HGVS': [AADT_HGVS],
-    'Design Period': [design_period],
-    'Total Projected AADT HGVs': [total_projected_aadt_hgvs],
-    'Lane 1': [lane1],
-    'Lane 2': [lane2],
-    'Lane 3': [lane3],
-    'Lane 4': [lane4],
-    'Lane 1 Details': [lane_details_lane1],
-    'Lane 2 Details': [lane_details_lane2],
-    'Lane 3 Details': [lane_details_lane3],
-    'Lane 4 Details': [lane_details_lane4],
-    'PSV Lane 1': [result if uploaded_file is not None else 'NA'],
-    'PSV Lane 2': [result2 if uploaded_file is not None else 'NA'],
-    'PSV Lane 3': [result3 if uploaded_file is not None else 'NA'],
-    'Link Section': [link_section]  # Add Link Section to the results
+# Store results in session state
+entry = {
+    'AADT_HGVS': AADT_HGVS,
+    'Design Period': design_period,
+    'Total Projected AADT HGVs': total_projected_aadt_hgvs,
+    'Lane 1': lane1,
+    'Lane 2': lane2,
+    'Lane 3': lane3,
+    'Lane 4': lane4,
+    'Lane 1 Details': lane_details_lane1,
+    'Lane 2 Details': lane_details_lane2,
+    'Lane 3 Details': lane_details_lane3,
+    'Lane 4 Details': lane_details_lane4,
+    'PSV Lane 1': result,
+    'PSV Lane 2': result2,
+    'PSV Lane 3': result3,
+    'Link Section': link_section
 }
 
-# Convert to DataFrame
-df_results = pd.DataFrame(results_data)
+# Append new entry to results list
+st.session_state.results_list.append(entry)
 
-# Display the DataFrame on the Streamlit page
-st.write("PSV Results Output", df_results)
+# Display all results
+st.write("All PSV Results Output")
+df_results = pd.DataFrame(st.session_state.results_list)
+st.write(df_results)
 
 # Convert the DataFrame to CSV
 csv_data = df_results.to_csv(index=False)
 
 # Create a download button for the CSV file
 st.download_button(
-    label="Download Results as CSV",
+    label="Download All Results as CSV",
     data=csv_data,
-    file_name='psv_results.csv',
+    file_name='psv_results_multiple.csv',
     mime='text/csv'
 )
