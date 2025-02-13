@@ -162,21 +162,21 @@ if uploaded_file is not None:
             else:
                 result2 = "No matching range found for lane 2."
 
-        # For Lane 3
-        if lane_details_lane3 > 0:
-            range_column = None
-            for col in df_psv_lookup.columns:
-                if '-' in col:
-                    col_range = list(map(int, col.split('-')))
-                    if col_range[0] <= lane_details_lane3 <= col_range[1]:
-                        range_column = col
-                        break
-            
-            if range_column:
-                filtered_df = df_psv_lookup[(df_psv_lookup['SiteCategory'] == value1) & (df_psv_lookup['IL'] == value2)]
-                if not filtered_df.empty:
-                    result3 = filtered_df.iloc[0][range_column]
-                else:
-                    result3 = "No matching result found."
-            else:
-                result3 = "
+      # For Lane 3
+if lane_details_lane3 > 0:
+    range_column = None
+    for col in df_psv_lookup.columns:
+        if '-' in col:
+            col_range = list(map(int, col.split('-')))
+            if col_range[0] <= lane_details_lane3 <= col_range[1]:
+                range_column = col
+                break
+    
+    if range_column:
+        filtered_df = df_psv_lookup[(df_psv_lookup['SiteCategory'] == value1) & (df_psv_lookup['IL'] == value2)]
+        if not filtered_df.empty:
+            result3 = filtered_df.iloc[0][range_column]
+        else:
+            result3 = "No matching result found."
+    else:
+        result3 = "No matching range found for lane 3."
