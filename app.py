@@ -1,4 +1,3 @@
-
 import pandas as pd
 import math
 import streamlit as st
@@ -10,24 +9,13 @@ st.title("Polished Stone Value (PSV) Calculator Results")
 st.sidebar.title("Polished Stone Value (PSV) Calculator")
 st.sidebar.header("Enter values:")
 
-# Initialize session state to store input values
-if "input_values" not in st.session_state:
-    st.session_state.input_values = {
-        "Site_Number": "",
-        "Link_Section": "",
-        "AADT_Value": 0,
-        "Per_HGVS": 0,
-        "Year": 0,
-        "Lanes": 1
-    }
-
 # Input fields
-st.session_state.input_values["Site_Number"] = st.sidebar.text_input("Enter Site Number:", value=st.session_state.input_values["Site_Number"])
-st.session_state.input_values["Link_Section"] = st.sidebar.text_input("Enter Link Section:", value=st.session_state.input_values["Link_Section"])
-st.session_state.input_values["AADT_Value"] = st.sidebar.number_input("Enter AADT value:", min_value=0, value=st.session_state.input_values["AADT_Value"])
-st.session_state.input_values["Per_HGVS"] = st.sidebar.number_input("Enter % of HGVs:", value=st.session_state.input_values["Per_HGVS"])
-st.session_state.input_values["Year"] = st.sidebar.number_input("Enter Year", min_value=0, value=st.session_state.input_values["Year"])
-st.session_state.input_values["Lanes"] = st.sidebar.number_input("Enter number of lanes", min_value=1, value=st.session_state.input_values["Lanes"])
+Site_Number = st.sidebar.text_input("Enter Site Number:")
+link_section = st.sidebar.text_input("Enter Link Section:")
+aadt_value = st.sidebar.number_input("Enter AADT value:", min_value=0)
+per_hgvs = st.sidebar.number_input("Enter % of HGVs:")
+year = st.sidebar.number_input("Enter Year", min_value=0)
+lanes = st.sidebar.number_input("Enter number of lanes", min_value=1)
 
 # Initialize session state to store results list
 if "results_list" not in st.session_state:
@@ -38,15 +26,12 @@ def roundup(value):
     return math.ceil(value)
 
 # Design period calculation
-year = st.session_state.input_values["Year"]
 if year == 0:
     design_period = 0
 else:
     design_period = (20 + 2025) - year
 
 # Calculation for AADT_HGVS
-aadt_value = st.session_state.input_values["AADT_Value"]
-per_hgvs = st.session_state.input_values["Per_HGVS"]
 if per_hgvs >= 11:
     result1 = per_hgvs
     AADT_HGVS = (result1 * (aadt_value / 100))
@@ -60,7 +45,6 @@ AADT_HGVS = round(AADT_HGVS)
 total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
 
 # Lane details
-lanes = st.session_state.input_values["Lanes"]
 lane1 = 0
 lane2 = 0
 lane3 = 0
@@ -162,21 +146,91 @@ if uploaded_file is not None:
             else:
                 result2 = "No matching range found for lane 2."
 
-      # For Lane 3
-if lane_details_lane3 > 0:
-    range_column = None
-    for col in df_psv_lookup.columns:
-        if '-' in col:
-            col_range = list(map(int, col.split('-')))
-            if col_range[0] <= lane_details_lane3 <= col_range[1]:
-                range_column = col
-                break
-    
-    if range_column:
-        filtered_df = df_psv_lookup[(df_psv_lookup['SiteCategory'] == value1) & (df_psv_lookup['IL'] == value2)]
-        if not filtered_df.empty:
-            result3 = filtered_df.iloc[0][range_column]
-        else:
-            result3 = "No matching result found."
+        # For Lane 3
+        if lane_details_lane3 > 0:
+            range_column = None
+            for col in df_psv_lookup.columns:
+                if '-' in col:
+                    col_range = list(map(int, col.split('-')))
+                    if col_range[0] <= lane_details_lane3 <= col_range[1]:
+                        range_column = col
+                        break
+            
+            if range_column:
+                filtered_df = df_psv_lookup[(df_psv_lookup['SiteCategory'] == value1) & (df_psv_lookup['IL'] == value2)]
+                if not filtered_df.empty:
+                    result3 = filtered_df.iloc[0][range_column]
+                else:
+                    result3 = "No matching result found."
+            else:
+                result3 = "No matching range found for lane 3."
+
+# Add result to session state when user clicks "Next Link Section"
+if st.sidebar.button("Next Link Section"):
+    entry = {
+        "Site Number": Site_Number,
+        "Link Section": link_section,
+        "AADT_HGVS": AADT_HGVS,
+        "Design Period": design_period,
+        "Total Projected AADT HGVs": total_projected_aadt_hgvs,
+        "Lane 1": lane1,
+        "Lane 2": lane2 if lanes > 1 else 'NA',
+        "Lane 3": lane3 if lanes > 2 else 'NA',
+        "Lane 4": lane4 if lanes > 3 else 'NA',
+        "Lane 1 Details": lane_details_lane1,
+        "Lane 2 Details": lane_details_lane2,
+        "Lane 3 Details": lane_details_lane3,
+        "Lane 4 Details": lane_details_lane4,
+        "PSV Lane 1": result1,
+        "PSV Lane 2": result2,
+        "PSV Lane 3": result3
+    }
+    st.session_state.results_list.append(entry)
+
+# Display stored results with a collapsible section
+st.subheader("PSV Calculation Results:")
+with st.expander("View PSV Calculation Results", expanded=True):
+    if st.session_state.results_list:
+        df_results = pd.DataFrame(st.session_state.results_list)
+        st.write(df_results)
+
+        # Create a download button for CSV
+        csv = df_results.to_csv(index=False)
+        st.download_button(
+            label="Download All Results as CSV",
+            data=csv,
+            file_name="psv_results.csv",
+            mime="text/csv"
+        )
     else:
-        result3 = "No matching range found for lane 3."
+        st.write("No results added yet.")
+
+# Collapsible section for editing results
+with st.expander("Edit Results"):
+    if st.session_state.results_list:
+        df_results = pd.DataFrame(st.session_state.results_list)
+        selected_index = st.selectbox("Select row to edit", options=range(len(df_results)), format_func=lambda x: f"Row {x+1}")
+        
+        if selected_index is not None:
+            selected_row = df_results.iloc[selected_index]
+            
+            # Editable fields
+            edited_site_number = st.text_input("Edit Site Number", value=selected_row["Site Number"])
+            edited_link_section = st.text_input("Edit Link Section", value=selected_row["Link Section"])
+            edited_aadt_hgvs = st.number_input("Edit AADT_HGVS", value=selected_row["AADT_HGVS"])
+            edited_design_period = st.number_input("Edit Design Period", value=selected_row["Design Period"])
+            edited_total_projected_aadt_hgvs = st.number_input("Edit Total Projected AADT HGVs", value=selected_row["Total Projected AADT HGVs"])
+            
+            # Update Button
+            if st.button("Update Entry"):
+                st.session_state.results_list[selected_index] = {
+                    "Site Number": edited_site_number,
+                    "Link Section": edited_link_section,
+                    "AADT_HGVS": edited_aadt_hgvs,
+                    "Design Period": edited_design_period,
+                    "Total Projected AADT HGVs": edited_total_projected_aadt_hgvs
+                }
+                st.success("Entry updated successfully!")
+                st.rerun()
+    else:
+        st.write("No results to edit.")
