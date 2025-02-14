@@ -170,20 +170,24 @@ if st.sidebar.button("Next Link Section"):
     entry = {
         "Site Number": Site_Number,
         "Link Section": link_section,
-        "AADT_HGVS": AADT_HGVS,
+        "AADT Value": aadt_value,
+        "% HGV       :per_hgvs,
+        "Year of Data: year,
+        "Lanes: lanes,
+        "AADT of HGVs": AADT_HGVS,
         "Design Period": design_period,
-        "Total Projected AADT HGVs": total_projected_aadt_hgvs,
-        "Lane 1": lane1,
-        "Lane 2": lane2 if lanes > 1 else 'NA',
-        "Lane 3": lane3 if lanes > 2 else 'NA',
-        "Lane 4": lane4 if lanes > 3 else 'NA',
-        "Lane 1 Details": lane_details_lane1,
-        "Lane 2 Details": lane_details_lane2,
-        "Lane 3 Details": lane_details_lane3,
-        "Lane 4 Details": lane_details_lane4,
-        "PSV Lane 1": result1,
-        "PSV Lane 2": result2,
-        "PSV Lane 3": result3
+        "Total Projected AADT of HGVs": total_projected_aadt_hgvs,
+        "% HGV in Lane 1": lane1,
+        "% HGV in Lane 2": lane2 if lanes > 1 else 'NA',
+        "% HGV in Lane 3": lane3 if lanes > 2 else 'NA',
+        "% HGV in Lane 4": lane4 if lanes > 3 else 'NA',
+        "Design traffic Lane 1": lane_details_lane1,
+        "Design traffic Lane 2": lane_details_lane2,
+        "Design traffic Lane 3": lane_details_lane3,
+        "Design traffic Lane 4": lane_details_lane4,
+        "Min.PSV Lane 1": result1,
+        "Min.PSV Lane 2": result2,
+        "Min.PSV Lane 3": result3
     }
     st.session_state.results_list.append(entry)
 
