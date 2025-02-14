@@ -187,4 +187,7 @@ if uploaded_file is not None:
             "% HGV in Lane 2": lane2 if lanes > 1 else 'NA',
             "% HGV in Lane 3": lane3 if lanes > 2 else 'NA',
             "% HGV in Lane 4": lane4 if lanes > 3 else 'NA',
-            "Design traffic Lane 1": lane
+            "Design traffic Lane 1": lane_details_lane1,
+            "Design traffic Lane 2": lane_details_lane2,
+            "Design traffic Lane 3": lane_details_lane3,
+            "Design traffic Lane 4": lane_details_lane4
