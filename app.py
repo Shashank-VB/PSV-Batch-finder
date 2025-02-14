@@ -221,147 +221,22 @@ with st.expander("Edit Results"):
             # Editable fields
             edited_site_number = st.text_input("Edit Site Number", value=selected_row["Site Number"])
             edited_link_section = st.text_input("Edit Link Section", value=selected_row["Link Section"])  
-            edited_AADT_Value = st.number_input("Edit AADT Value", value=selected_row["AADT Value"])
-            edited_percent_hgv = st.number_input("Edit % of HGVs", value=selected_row["percent hgv"])
-            edited_year_of_Data = st.number_input("Edit Year of Data", value=selected_row["Year of Data"])
-            edited_Lanes = st.number_input("Edit Lanes", value=selected_row["Lanes"])
-            
+            edited_AADT_Value = st.text_input("Edit AADT Value", value=selected_row["AADT Value"])
+            edited_percent_hgv = st.number_input("percent hgv", value=selected_row["percent hgv"])
+            edited_year_of_Data = st.number_input("Year of Data", value=selected_row["Year of Data"])
+            edited_Lanes = st.number_input("Lanes", value=selected_row["Lanes"])
+                     
             # Update Button
             if st.button("Update Entry"):
-                # Recalculate values based on edited inputs
-                design_period = (20 + 2025) - edited_year_of_Data
-                if edited_percent_hgv >= 11:
-                    AADT_HGVS = (edited_percent_hgv * (edited_AADT_Value / 100))
-                else:
-                    AADT_HGVS = (11 * edited_AADT_Value) / 100
-
-                total_projected_aadt_hgvs = AADT_HGVS * ((1 + 1.54 / 100) ** design_period)
-                AADT_HGVS = round(AADT_HGVS)
-                total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
-
-                # Update lane details and PSV calculations as needed
-                lane1 = lane2 = lane3 = lane4 = 0
-                lane_details_lane1 = lane_details_lane2 = lane_details_lane3 = lane_details_lane4 = 0
-
-                if edited_Lanes == 1:
-                    lane1 = 100
-                    lane_details_lane1 = total_projected_aadt_hgvs
-                elif edited_Lanes > 1 and edited_Lanes <= 3:
-                    if total_projected_aadt_hgvs < 5000:
-                        lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
-                        lane2 = round(100 - lane1)
-                    elif total_projected_aadt_hgvs >= 5000 and total_projected_aadt_hgvs < 25000:
-                        lane1 = round(89 - (0.0014 * total_projected_aadt_hgvs))
-                        lane2 = round(100 - lane1)
-                    elif total_projected_aadt_hgvs >= 25000:
-                        lane1 = 54
-                        lane2 = 100 - 54
-                    lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
-                    lane_details_lane2 = round(total_projected_aadt_hgvs * (lane2 / 100))
-                elif edited_Lanes >= 4:
-                    if total_projected_aadt_hgvs <= 10500:
-                        lane1 = round(100 - (0.0036 * total_projected_aadt_hgvs))
-                        lane_2_3 = (total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100))
-                        lane2 = round(89 - (0.0014 * lane_2_3))
-                        lane3 = 100 - lane2
-                    elif total_projected_aadt_hgvs > 10500 and total_projected_aadt_hgvs < 25000:
-                        lane1 = round(75 - (0.0012 * total_projected_aadt_hgvs))
-                        lane_2_3 = (total_projected_aadt_hgvs - ((total_projected_aadt_hgvs * lane1) / 100))
-                        lane2 = round(89 - (0.0014 * lane_2_3))
-                        lane3 = 100 - lane2
-                    elif total_projected_aadt_hgvs >= 25000:
-                        lane1 = 45
-                        lane2 = 54
-                        lane3 = 100 - 54
-                    lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
-                    lane_details_lane2 = round((total_projected_aadt_hgvs - lane_details_lane1) * (lane2 / 100))
-                    lane_details_lane3 = round(total_projected_aadt_hgvs - (lane_details_lane1 + lane_details_lane2))
-
-                # PSV Calculation - Placeholder logic (based on the upload of the PSV lookup table)
-                value1 = selected_row["Site Category"]
-                value2 = selected_row["IL value"]
-                result1 = result2 = result3 = 'NA'
-
-                if uploaded_file is not None:
-                    df_psv_lookup = pd.read_excel(uploaded_file)
-
-                    if value1 and value2:
-                        range_column = None
-                        for col in df_psv_lookup.columns:
-                            if '-' in col:
-                                col_range = list(map(int, col.split('-')))
-                                if col_range[0] <= lane_details_lane1 <= col_range[1]:
-                                    range_column = col
-                                    break
-                        
-                        if range_column:
-                            filtered_df = df_psv_lookup[(df_psv_lookup['SiteCategory'] == value1) & (df_psv_lookup['IL'] == value2)]
-                            if not filtered_df.empty:
-                                result1 = filtered_df.iloc[0][range_column]
-                            else:
-                                result1 = "No matching result found."
-                        else:
-                            result1 = "No matching range found for lane 1."
-
-                        if lane_details_lane2 > 0:
-                            range_column = None
-                            for col in df_psv_lookup.columns:
-                                if '-' in col:
-                                    col_range = list(map(int, col.split('-')))
-                                    if col_range[0] <= lane_details_lane2 <= col_range[1]:
-                                        range_column = col
-                                        break
-                            
-                            if range_column:
-                                filtered_df = df_psv_lookup[(df_psv_lookup['SiteCategory'] == value1) & (df_psv_lookup['IL'] == value2)]
-                                if not filtered_df.empty:
-                                    result2 = filtered_df.iloc[0][range_column]
-                                else:
-                                    result2 = "No matching result found."
-                            else:
-                                result2 = "No matching range found for lane 2."
-
-                        if lane_details_lane3 > 0:
-                            range_column = None
-                            for col in df_psv_lookup.columns:
-                                if '-' in col:
-                                    col_range = list(map(int, col.split('-')))
-                                    if col_range[0] <= lane_details_lane3 <= col_range[1]:
-                                        range_column = col
-                                        break
-                            
-                            if range_column:
-                                filtered_df = df_psv_lookup[(df_psv_lookup['SiteCategory'] == value1) & (df_psv_lookup['IL'] == value2)]
-                                if not filtered_df.empty:
-                                    result3 = filtered_df.iloc[0][range_column]
-                                else:
-                                    result3 = "No matching result found."
-                            else:
-                                result3 = "No matching range found for lane 3."
-
                 st.session_state.results_list[selected_index] = {
                     "Site Number": edited_site_number,
                     "Link Section": edited_link_section,
                     "AADT Value": edited_AADT_Value,
                     "percent hgv": edited_percent_hgv,
                     "Year of Data": edited_year_of_Data,
-                    "Lanes": edited_Lanes,
-                    "AADT of HGVs": AADT_HGVS,
-                    "Design Period": design_period,
-                    "Total Projected AADT of HGVs": total_projected_aadt_hgvs,
-                    "% HGV in Lane 1": lane1,
-                    "% HGV in Lane 2": lane2 if edited_Lanes > 1 else 'NA',
-                    "% HGV in Lane 3": lane3 if edited_Lanes > 2 else 'NA',
-                    "% HGV in Lane 4": lane4 if edited_Lanes > 3 else 'NA',
-                    "Design traffic Lane 1": lane_details_lane1,
-                    "Design traffic Lane 2": lane_details_lane2,
-                    "Design traffic Lane 3": lane_details_lane3,
-                    "Design traffic Lane 4": lane_details_lane4,
-                    "Min.PSV Lane 1": result1,
-                    "Min.PSV Lane 2": result2,
-                    "Min.PSV Lane 3": result3
+                    "Lanes": edited_Lanes
                 }
-                st.success("Entry updated and recalculated successfully!")
+                st.success("Entry updated successfully!")
                 st.rerun()
     else:
         st.write("No results to edit.")
