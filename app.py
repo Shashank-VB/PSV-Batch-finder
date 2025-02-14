@@ -171,7 +171,7 @@ if st.sidebar.button("Next Link Section"):
         "Site Number": Site_Number,
         "Link Section": link_section,
         "AADT Value": aadt_value,
-        "% HGV"     :per_hgvs,
+        "percent_hgv"     :per_hgvs,
         "Year of Data": year,
         "Lanes": lanes,
         "AADT of HGVs": AADT_HGVS,
@@ -221,7 +221,7 @@ with st.expander("Edit Results"):
             # Editable fields
             edited_site_number = st.text_input("Edit Site Number", value=selected_row["Site Number"])
             edited_link_section = st.text_input("Edit Link Section", value=selected_row["Link Section"])  
-            edited_%HGV = st.number_input("% HGV", value=selected_row["% HGV"])
+            edited_percent_hgv = st.number_input("% HGV", value=selected_row["% HGV"
             edited_year_of_Data = st.number_input("Year of Data", value=selected_row["Year of Data"])
             edited_Lanes = st.number_input("Lanes", value=selected_row["Lanes"])
                      
