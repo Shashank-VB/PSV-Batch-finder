@@ -225,18 +225,36 @@ with st.expander("Edit Results"):
             edited_percent_hgv = st.number_input("percent hgv", value=selected_row["percent hgv"])
             edited_year_of_Data = st.number_input("Year of Data", value=selected_row["Year of Data"])
             edited_Lanes = st.number_input("Lanes", value=selected_row["Lanes"])
-                     
-            # Update Button
-            if st.button("Update Entry"):
+            
+            # Update Button         
+           if st.button("Update Entry"):
+                # Recalculate values based on edited inputs
+                design_period = (20 + 2025) - edited_year_of_Data
+                if edited_percent_hgv >= 11:
+                    AADT_HGVS = (edited_percent_hgv * (edited_AADT_Value / 100))
+                else:
+                    AADT_HGVS = (11 * edited_AADT_Value) / 100
+
+                total_projected_aadt_hgvs = AADT_HGVS * ((1 + 1.54 / 100) ** design_period)
+                AADT_HGVS = round(AADT_HGVS)
+                total_projected_aadt_hgvs = round(total_projected_aadt_hgvs)
+
+                # Update lane details and PSV calculations as needed
+                # (Include the same logic as in the initial calculation section)
+
                 st.session_state.results_list[selected_index] = {
                     "Site Number": edited_site_number,
                     "Link Section": edited_link_section,
                     "AADT Value": edited_AADT_Value,
                     "percent hgv": edited_percent_hgv,
                     "Year of Data": edited_year_of_Data,
-                    "Lanes": edited_Lanes
+                    "Lanes": edited_Lanes,
+                    "AADT of HGVs": AADT_HGVS,
+                    "Design Period": design_period,
+                    "Total Projected AADT of HGVs": total_projected_aadt_hgvs,
+                    # Add other recalculated fields here
                 }
-                st.success("Entry updated successfully!")
+                st.success("Entry updated and recalculated successfully!")
                 st.rerun()
     else:
         st.write("No results to edit.")
