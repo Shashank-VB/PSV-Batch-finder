@@ -192,3 +192,5 @@ if uploaded_file is not None:
             "Design traffic Lane 3": lane_details_lane3,
             "Design traffic Lane 4": lane_details_lane4,
             "Min.PSV Lane 1": result1,
+            }
+    st.session_state.results_list.append(entry)
