@@ -221,6 +221,7 @@ with st.expander("Edit Results"):
             # Editable fields
             edited_site_number = st.text_input("Edit Site Number", value=selected_row["Site Number"])
             edited_link_section = st.text_input("Edit Link Section", value=selected_row["Link Section"])  
+            edited_AADT_Value = st.text_input("Edit AADT Value", value=selected_row["AADT Value"])
             edited_percent_hgv = st.number_input("percent hgv", value=selected_row["percent hgv"])
             edited_year_of_Data = st.number_input("Year of Data", value=selected_row["Year of Data"])
             edited_Lanes = st.number_input("Lanes", value=selected_row["Lanes"])
@@ -230,6 +231,7 @@ with st.expander("Edit Results"):
                 st.session_state.results_list[selected_index] = {
                     "Site Number": edited_site_number,
                     "Link Section": edited_link_section,
+                    "AADT Value": edited_AADT_Value,
                     "percent hgv": edited_percent_hgv,
                     "Year of Data": edited_year_of_Data,
                     "Lanes": edited_Lanes
