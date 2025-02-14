@@ -230,9 +230,9 @@ with st.expander("Edit Results"):
                 st.session_state.results_list[selected_index] = {
                     "Site Number": edited_site_number,
                     "Link Section": edited_link_section,
-                    "AADT_HGVS": edited_aadt_hgvs,
-                    "Design Period": edited_design_period,
-                    "Total Projected AADT HGVs": edited_total_projected_aadt_hgvs
+                    "percent hgv": edited_percent_hgv,
+                    "Year of Data": edited_year_of_Data,
+                    "Lanes": edited_Lanes
                 }
                 st.success("Entry updated successfully!")
                 st.rerun()
