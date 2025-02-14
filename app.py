@@ -209,34 +209,3 @@ with st.expander("View PSV Calculation Results", expanded=True):
     else:
         st.write("No results added yet.")
 
-# Collapsible section for editing results
-with st.expander("Edit Results"):
-    if st.session_state.results_list:
-        df_results = pd.DataFrame(st.session_state.results_list)
-        selected_index = st.selectbox("Select row to edit", options=range(len(df_results)), format_func=lambda x: f"Row {x+1}")
-        
-        if selected_index is not None:
-            selected_row = df_results.iloc[selected_index]
-            
-            # Editable fields
-            edited_site_number = st.text_input("Edit Site Number", value=selected_row["Site Number"])
-            edited_link_section = st.text_input("Edit Link Section", value=selected_row["Link Section"])  
-            edited_AADT_Value = st.text_input("Edit AADT Value", value=selected_row["AADT Value"])
-            edited_percent_hgv = st.number_input("percent hgv", value=selected_row["percent hgv"])
-            edited_year_of_Data = st.number_input("Year of Data", value=selected_row["Year of Data"])
-            edited_Lanes = st.number_input("Lanes", value=selected_row["Lanes"])
-                     
-            # Update Button
-            if st.button("Update Entry"):
-                st.session_state.results_list[selected_index] = {
-                    "Site Number": edited_site_number,
-                    "Link Section": edited_link_section,
-                    "AADT Value": edited_AADT_Value,
-                    "percent hgv": edited_percent_hgv,
-                    "Year of Data": edited_year_of_Data,
-                    "Lanes": edited_Lanes
-                }
-                st.success("Entry updated successfully!")
-                st.rerun()
-    else:
-        st.write("No results to edit.")
