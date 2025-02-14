@@ -171,7 +171,7 @@ if st.sidebar.button("Next Link Section"):
         "Site Number": Site_Number,
         "Link Section": link_section,
         "AADT Value": aadt_value,
-        "% HGV       :per_hgvs,
+        "% HGV:per_hgvs,
         "Year of Data: year,
         "Lanes: lanes,
         "AADT of HGVs": AADT_HGVS,
