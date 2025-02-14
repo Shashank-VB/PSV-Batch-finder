@@ -221,13 +221,13 @@ with st.expander("Edit Results"):
             # Editable fields
             edited_site_number = st.text_input("Edit Site Number", value=selected_row["Site Number"])
             edited_link_section = st.text_input("Edit Link Section", value=selected_row["Link Section"])  
-            edited_AADT_Value = st.text_input("Edit AADT Value", value=selected_row["AADT Value"])
-            edited_percent_hgv = st.number_input("percent hgv", value=selected_row["percent hgv"])
-            edited_year_of_Data = st.number_input("Year of Data", value=selected_row["Year of Data"])
-            edited_Lanes = st.number_input("Lanes", value=selected_row["Lanes"])
+            edited_AADT_Value = st.number_input("Edit AADT Value", value=selected_row["AADT Value"])
+            edited_percent_hgv = st.number_input("Edit % of HGVs", value=selected_row["percent hgv"])
+            edited_year_of_Data = st.number_input("Edit Year of Data", value=selected_row["Year of Data"])
+            edited_Lanes = st.number_input("Edit Lanes", value=selected_row["Lanes"])
             
-            # Update Button         
-           if st.button("Update Entry"):
+            # Update Button
+            if st.button("Update Entry"):
                 # Recalculate values based on edited inputs
                 design_period = (20 + 2025) - edited_year_of_Data
                 if edited_percent_hgv >= 11:
