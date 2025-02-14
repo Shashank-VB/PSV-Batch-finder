@@ -220,11 +220,14 @@ with st.expander("Edit Results"):
             
             # Editable fields
             edited_site_number = st.text_input("Edit Site Number", value=selected_row["Site Number"])
-            edited_link_section = st.text_input("Edit Link Section", value=selected_row["Link Section"])
-            edited_aadt_hgvs = st.number_input("Edit AADT_HGVS", value=selected_row["AADT_HGVS"])
-            edited_design_period = st.number_input("Edit Design Period", value=selected_row["Design Period"])
-            edited_total_projected_aadt_hgvs = st.number_input("Edit Total Projected AADT HGVs", value=selected_row["Total Projected AADT HGVs"])
-            
+            edited_link_section = st.text_input("Edit Link Section", value=selected_row["Link Section"])  
+
+       
+        "Lanes": lanes,
+            edited_%_HGV = st.number_input("% HGV", value=selected_row["% HGV"])
+            edited_year_of_Data = st.number_input("Year of Data", value=selected_row["Year of Data"])
+            edited_Lanes = st.number_input("Lanes", value=selected_row["Lanes"])
+                     
             # Update Button
             if st.button("Update Entry"):
                 st.session_state.results_list[selected_index] = {
