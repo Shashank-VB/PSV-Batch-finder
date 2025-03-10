@@ -91,8 +91,8 @@ elif lanes >= 4:
         lane3 = 100 - lane2
         lane4 = 0
     lane_details_lane1 = round(total_projected_aadt_hgvs * (lane1 / 100))
-    lane_details_lane2 = round((total_projected_aadt_hgvs - lane_details_lane1) * (lane2 / 100))
-    lane_details_lane3 = round(total_projected_aadt_hgvs - (lane_details_lane1 + lane_details_lane2))
+    lane_details_lane2 = round((total_projected_aadt_hgvs * (lane2 / 100))
+    lane_details_lane3 = round(total_projected_aadt_hgvs - (lane3 / 100))
 
 # PSV Calculation - Placeholder logic (based on the upload of the PSV lookup table)
 value1 = st.sidebar.text_input("Enter Site Category:")
